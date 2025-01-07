@@ -1,0 +1,3 @@
+- https://github.com/jackdoe/programming-for-kids?tab=readme-ov-file + a lot of other resources there
+- https://inventwithpython.com/invent4thed/
+- p5.js
