@@ -1,0 +1,13 @@
+[project]
+name = "jupyterlite-jojo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+dependencies = [
+    "jupyter-server>=2.15.0",
+    "jupyterlab-night>=0.5.1",
+    "jupyterlab-server>=2.27.3",
+    "jupyterlite-core>=0.4.5,<0.5.0",
+    "jupyterlite-p5-kernel>=0.1.1",
+    "jupyterlite-xeus>=2.1.2,<3",
+]

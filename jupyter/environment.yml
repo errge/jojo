@@ -1,0 +1,19 @@
+name: jupyterlite-build-jojo
+channels:
+  - https://repo.mamba.pm/emscripten-forge
+  - conda-forge
+dependencies:
+  - python=3.11
+  - xeus-python
+  - numpy
+  - sympy
+  - ipycanvas
+  - matplotlib
+  - ipyleaflet
+  - ipywidgets
+  - ipympl
+  - plotly
+
+# todo: learn jupyterlab-sphinx
+# todo: learn myst-parser
+# todo: help humanity by making jupytext work

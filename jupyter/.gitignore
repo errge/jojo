@@ -1,0 +1,4 @@
+/.venv*
+/_output
+/.jupyterlite.doit.db
+/uv.lock
