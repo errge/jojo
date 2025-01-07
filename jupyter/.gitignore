@@ -2,3 +2,4 @@
 /_output
 /.jupyterlite.doit.db
 /uv.lock
+/contents-ipynb
