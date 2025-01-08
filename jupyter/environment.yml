@@ -13,6 +13,8 @@ dependencies:
   - ipywidgets
   - ipympl
   - plotly
+  - conda-forge::tabulate
+  - nbformat
 
 # todo: learn jupyterlab-sphinx
 # todo: learn myst-parser

@@ -27,6 +27,9 @@ rm -rf .venv/bootstrap
 .venv/uv venv --allow-existing -n .venv
 .venv/uv sync
 
+# Needed for PDF generation
+.venv/bin/playwright install chromium
+
 # micromamba is needed for jupyter build
 curl -sL -o .venv/bin/micromamba https://github.com/mamba-org/micromamba-releases/releases/download/2.0.5-0/micromamba-linux-64
 chmod a+x .venv/bin/micromamba
