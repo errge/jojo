@@ -15,7 +15,7 @@
 #
 # Ez az alak remekül használható értéktáblázat (value table) készítéséhez, csak be kell helyettesítenünk a kívánt számokat és készen vagyunk.
 
-# %%
+# %% {"jupyter": {"source_hidden": true}}
 import sympy
 from IPython.display import display, HTML
 from tabulate import tabulate
@@ -36,7 +36,7 @@ display(tabulate([['Output'] + outputs], headers=['Input'] + inputs, tablefmt='h
 #
 # Lássuk többet látunk-e, ha ábrázoljuk ezeket a pontokat és megpróbáljuk csak egyszerűen összekötni őket!
 
-# %%
+# %% {"jupyter": {"source_hidden": true}}
 import plotly.graph_objects as go
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=inputs, y=outputs, mode = 'markers+lines', name='f'))
@@ -99,7 +99,7 @@ fig
 #
 # (Vegyük észre, hogy az ábrán az x és y tengely a láthatóság kedvéért nem ugyanolyan beosztással van rajzolva, az y tengely jelentősen "sűrűbb", ezért látszik még a háromszoros parabola is nem túl gyorsan növekvőnek.)
 
-# %%
+# %% {"jupyter": {"source_hidden": true}}
 import numpy as np
 
 f1 = x**2
