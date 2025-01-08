@@ -157,3 +157,65 @@ fig.show()
 #   - $-x_2+{7\over6} = {11\over6}$, azaz $x_2 = -{4\over6} = -{2\over3}$
 #
 # A második gyökben is tévedtünk, az nem a $-{1\over2}$, hanem a $-{2\over3}$ helyen van.
+
+# %% [markdown]
+# ## Módszer = Algoritmus
+#
+# Az, hogy a teljes négyzetté alakítás egy "módszer", azt jelenti, hogy az mindig elvégezhető, és ezért a számítógépbe is le kell, hogy tudjuk programozni, azaz automatizálható.
+#
+# Az alábbi program pontosan ezt csinálja, és ellenőrzést is tartalmaz, hogy biztos legyen benne, hogy helyesen oldotta meg a feladatot.
+#
+# A program kicsit hosszú és meglehetősen csúnya, mert az emberi gondolkodásmódra kényszerítjük benne a számítógépet, hogy formálisan lépésenként végigszámolja, és ki is írja nekünk a lépéseket.
+#
+# Mindazonáltal, a lényeg itt nem a program minősége, hanem annak megmutatása, hogy ez a módszer valóban mindig működik, automatizálható és helyes eredményt ad.
+
+# %% {"jupyter": {"source_hidden": true}}
+def teljes_negyzetes_hazi_megoldo(f):
+    a = f.coeff(x, 2)
+    b = f.coeff(x, 1)
+    c = f.coeff(x, 0)
+    display(HTML(f"<div>1. Kiinduló kifejezés: ${sympy.latex(f)}$, együtthatók: {a}, {b}, {c}</div>"))
+    if b == 0:
+        display(HTML(f"<div>Nincs $x$-es tag, a kifejezés már teljes négyzetes alakban van, a parabola ábrázolásakor jobbra-balra mozgatás nem kell, csak le-fel mozgatás!</div>"))
+        return
+    f_inner = f / a
+    f_inner_b = f_inner.coeff(x, 1)
+    f_inner_c = f_inner.coeff(x, 0)
+    f_inner_c_latex = ""
+    if f_inner_c == 0:
+        f_inner_c_latex = "+ 0"
+    elif f_inner_c > 0:
+        f_inner_c_latex = f"+ {f_inner_c}"
+    else:
+        f_inner_c_latex = sympy.latex(f_inner_c)
+    display(HTML(f"<div>2. Kiemelünk {a}-t: $${a}({sympy.latex(x**2+f_inner_b)}x{f_inner_c_latex})$$</div>"))
+    display(HTML(f"<div>3. Előkészítjuk az $(a\\pm b)^2 = a^2\\pm2ab+b^2$ átírást, az $x$ együtthatójába bevezetjük a 2-t: $${a}({sympy.latex(x**2 + f_inner_b/2)}\\cdot2\\cdot x{f_inner_c_latex})$$</div>"))
+    display(HTML("<div>4. Elvégezzük a nevezetes azonosság átírását, figyelünk, hogy a $({b\\over2})^2$-et levonni ne felejtsük: " + f"$${a}(({sympy.latex(x+f_inner_b/2)})^2-{sympy.latex((f_inner_b/2)**2) + f_inner_c_latex})$$</div>"))
+    merged_b22c = -(f_inner_b/2)**2+f_inner_c
+    merged_b22c_latex = 0
+    if merged_b22c == 0:
+        merged_b22c_latex = "+ 0"
+    elif merged_b22c > 0:
+        merged_b22c_latex = f"+ {merged_b22c}"
+    else:
+        merged_b22c_latex = sympy.latex(merged_b22c)
+    display(HTML("<div>5. A most bevezetett $({b\\over2})^2$ korrigáló tagot és az eredeti $c$ konstanst összevonjuk: " + f"$${a}(({sympy.latex(x+f_inner_b/2)})^2 {merged_b22c_latex})$$</div>"))
+    final = a*(x+f_inner_b/2)**2+a*merged_b22c
+    display(HTML(f"<div>6. Végül felbontjuk a (külső) zárójelet, a kialakult eredmény egy eltolásokkal ábrázolható parabola: $${sympy.latex(final)}$$</div>"))
+    display(HTML(f"<div>7. Ellenőrzés: {final.expand() == f}</div>"))
+
+teljes_negyzetes_hazi_megoldo(3*x**2 - 7*x - 6)
+
+# %% {"jupyter": {"source_hidden": true}}
+# További tesztek, ide tudjátok beírni a házi feladatot könnyen, de persze olyat senki nem csinálna!!! ;)
+
+for test in [
+    x**2,
+    x**2+4,
+    x**2+4*x,
+    2*x**2+8*x+8,
+    2*x**2+8*x+16,
+    3*x**2-7*x+120
+]:
+    teljes_negyzetes_hazi_megoldo(test)
+    display(HTML("<hr>"))
