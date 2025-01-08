@@ -63,12 +63,12 @@ fig
 #
 # A következő ötletek kellenek, hogy eszünkbe jussanak, a következő átalakítást, módszert kell elvégeznünk:
 #   - $3x^2 - 7x - 6$
-#     - az $x^2$ együtthatóját mindig kiemelejük, ez a lépés kihagyható, ha az négyzetes tag együtthatója 1
+#     - az $x^2$ együtthatóját mindig kiemeljük, ez a lépés kihagyható, ha a négyzetes tag együtthatója 1
 #   - $3(x^2 - {7\over3}x - 2)$
 #     - a lineáris (csak $x$-et tartalmazó) tag együtthatóját olyan formára hozzuk, hogy valaminek a duplája legyen
 #     - így már emlékeztet az $(a+b)^2 = a^2 + 2ab + b^2$ nevezetes azonosságra
 #   - $3(x^2 - 2{7\over6}x - 2)$
-#     - a nevezetes azonosságot visszafele alkalmazzuk, mindig $a=x^2$ és jelen esetben $b={7\over6}$
+#     - a nevezetes azonosságot visszafele alkalmazzuk, mindig $a = x$ és jelen esetben $b = {7\over6}$
 #     - azonban $b^2={7\over6}^2$ értéket nem látunk sehol, tehát azt le kell vonnunk, hogy ne "hazudjunk"
 #   - $3((x-{7\over6})^2-{49\over36}-2)$
 #     - a külső zárójelet felbontjuk, de a négyzet zárójelét természetesen nem, pont azon küzdöttünk, hogy az kialakuljon
