@@ -78,7 +78,7 @@ fig
 #
 # A módszer végrehajtása után a végeredmény mindig ilyen alakú: $a(x+b)^2+c$, jelen esetben $a=3$, $b=-{7\over6}$ és $c=-{121\over12}$.
 #
-# Nagyon figyeljünk arra, amikor gondolkodunk, hogy az előjelek az egyes tagokhoz éppen negatívak vagy pozitívak!
+# Nagyon figyeljünk arra, amikor gondolkodunk, hogy az egyes tagokhoz tartozó előjelek éppen negatívak vagy pozitívak!
 #
 # Ezt az alakot több okból is szeretik a matematikában, először is, nagyon könnyűvé teszi a függvény számítógép nélküli ábrázolását:
 #   - kiindulunk az eredeti $x^2$ parabolábol az origóban,
@@ -89,7 +89,7 @@ fig
 #     - méghozzá jobbra kell tolni $7\over6$ értékkel,
 #     - igen, ez itt kicsit meglepő, a kifejezés kontravariánsan viselkedik: amennyiben $b<0$ akkor kell jobbra tolni és ha $b$ pozitív akkor kell balra tolni,
 #     - ezt úgy könnyű megjegyezni, ha a nulla pontra koncentrálunk, nullának a négyzete is nulla és az $x-{7\over6}$ pont akkor nulla, ha az x-et jobbra toljuk pozitív ${7\over6}$-ba,
-#   - végül az egész függvényt függőlegesen kell tolni $c$ értékével, pozitív esetén felfelé, negatív esetén lefelé, ezesetben nincs meglepetés.
+#   - végül az egész függvényt függőlegesen kell tolni $c$ értékével, pozitív esetén felfelé, negatív esetén lefelé, itt nincs meglepetés.
 #
 # Az alábbi ábrán megtekinthető a lépések menete:
 #   - piros: $x^2$
@@ -123,7 +123,7 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(x=x_vals, y=y_vals_f1, mode='lines', name='x²', line = { 'color': 'red' }))
 fig.add_trace(go.Scatter(x=x_vals, y=y_vals_f2, mode='lines', name='3x²', line = { 'color': 'orange' }))
 fig.add_trace(go.Scatter(x=x_vals, y=y_vals_f3, mode='lines', name='3(x-7/6)²', line = { 'color': 'blue' }))
-fig.add_trace(go.Scatter(x=x_vals, y=y_vals_f4, mode='lines', name='f4', line = { 'color': 'black' }))
+fig.add_trace(go.Scatter(x=x_vals, y=y_vals_f4, mode='lines', name='3(x-7/6)²-121/12', line = { 'color': 'black' }))
 
 fig.update_xaxes(range=[-4,4], zerolinecolor = 'black')
 fig.update_yaxes(range=[-15,20], zerolinecolor = 'black')
