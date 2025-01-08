@@ -61,7 +61,7 @@ fig
 # %% [markdown]
 # ## Teljes négyzetes alak (más nevén: tengelyes vagy csúcsponti, angolul: vertex form)
 #
-# A következő ötletek kellenek, hogy eszünkbe jusson, a következő átalakítást, módszert kell elvégeznünk:
+# A következő ötletek kellenek, hogy eszünkbe jussanak, a következő átalakítást, módszert kell elvégeznünk:
 #   - $3x^2 - 7x - 6$
 #     - az $x^2$ együtthatóját mindig kiemelejük, ez a lépés kihagyható, ha az négyzetes tag együtthatója 1
 #   - $3(x^2 - {7\over3}x - 2)$
