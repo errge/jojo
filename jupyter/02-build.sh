@@ -11,6 +11,7 @@ for f in contents/*.py; do
 
     # Evaluated ipynbs can be very big, we already have the PDF, let's delete the evaluation
     rm contents-ipynb/$(basename $f .py).ipynb
-    jupytext --to ipynb -o contents-ipynb/$(basename $f .py).ipynb $f
+    # Set kernel to xpython, so user doesn't have to select
+    jupytext --update-metadata '{"kernelspec":{"name":"xpython"}}' --to ipynb -o contents-ipynb/$(basename $f .py).ipynb $f
 done
 jupyter lite build --no-sourcemaps --contents contents-ipynb
