@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -xeuo pipefail
+shopt -s nullglob
 
 . .venv/bin/activate
 rm -rf .jupyterlite.doit.db _output contents-ipynb
