@@ -27,6 +27,14 @@ rm -rf .venv/bootstrap
 .venv/uv venv --allow-existing -n .venv
 .venv/uv sync
 
+# TODO: help humanity by making jupytext actually work in jupyerlite
+
+# Remove jupytext labextension, because:
+#   - jupyter lite build automatically takes all the extensions from the build env
+#   - jupytext doesn't work inside jupyterlite
+#   - but it creates a lot of confusing menu items, none of which are working
+rm -rf .venv/share/jupyter/labextensions/jupyterlab-jupytext
+
 # Needed for PDF generation
 .venv/bin/playwright install chromium
 
