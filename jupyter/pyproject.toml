@@ -6,6 +6,7 @@ readme = "README.md"
 dependencies = [
     "ipykernel>=6.29.5,<7",
     "jupyter-server>=2.15.0,<3",
+    "jupyterlab-filesystem-access>=0.6.0",
     "jupyterlab-night>=0.5.1,<1",
     "jupyterlab-server>=2.27.3,<3",
     "jupyterlite-core>=0.4.5,<0.5.0",
