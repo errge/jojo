@@ -64,7 +64,7 @@ mc = MultiCanvas(2, width = 800, height = 400)
 for layer in [canvas, background]:
     layer.translate(200, 200)
     layer.scale(5, 5)
-    layer.font = '4px serif'
+    layer.font = '4px mono'
 
 background.fill_text('Time:', 30, -30)
 background.fill_text('Distance:', 30, -25)
@@ -105,10 +105,10 @@ def draw(time):
 
     canvas.fill_style = 'black'
 
-    canvas.fill_text(f'{time:.2f} hours', 70, -30)
-    canvas.fill_text(f'{distance:.2f} km', 70, -25)
-    canvas.fill_text(f'{eve:.2f} km', 70, -20)
-    canvas.fill_text(f'{joe:.2f} km', 70, -15)
+    canvas.fill_text(f'{time:7.2f} hours', 70, -30)
+    canvas.fill_text(f'{distance:7.2f} km', 70, -25)
+    canvas.fill_text(f'{eve:7.2f} km', 70, -20)
+    canvas.fill_text(f'{joe:7.2f} km', 70, -15)
 
 slider = FloatSlider(value = 0, min = -1.2, max = 1.2, step = 0.01, readout = True, readout_format = '.2f', layout=Layout(width='800px'))
 interact(draw, time = slider)
