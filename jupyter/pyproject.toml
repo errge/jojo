@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 dependencies = [
+    "ipycanvas>=0.13.3,<1",
     "ipykernel>=6.29.5,<7",
     "jupyter-server>=2.15.0,<3",
     "jupyterlab-filesystem-access>=0.6.0",
