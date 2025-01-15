@@ -1,7 +1,7 @@
 # %% [markdown]
-# Two cyclists are driving on perpendicular streets towards their future intersection.
+# Two cyclists are riding on perpendicular streets towards their future intersection.
 #
-# They are both driving with steady speed.
+# They are both riding with steady speed.
 #
 # The faster one (Eve) is doing 40 km/h and is starting at 10 km from the intersection.
 #
