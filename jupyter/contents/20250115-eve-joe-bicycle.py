@@ -70,25 +70,19 @@ background.fill_text('Time:', 30, -30)
 background.fill_text('Distance:', 30, -25)
 background.fill_text('Eve (green):', 30, -20)
 background.fill_text('Joe (blue):', 30, -15)
-
 background.line_width = 0.25
 background.stroke_line(-200, 0, 200, 0)
 background.stroke_line(0, -200, 0, 200)
 
-canvas = mc[1]
-
-def reset_canvas():
-    canvas.clear_rect(-10000, -10000, 20000, 20000)
-    canvas.line_width = 1
-    canvas.stroke_style = 'black'
-    canvas.fill_style = 'black'
+canvas.line_width = 0.1
+canvas.stroke_style = 'red'
 
 def bicycle_position(time, startingpos, velocity):
     return startingpos + velocity * time
 
 @throttle(0.2)
 def draw(time):
-    reset_canvas()
+    canvas.clear_rect(-200, -200, 400, 400)
 
     joe = bicycle_position(time, 20, -30)
     eve = bicycle_position(time, 10, -40)
@@ -97,8 +91,6 @@ def draw(time):
     canvas.fill_style = 'green'
     canvas.fill_circle(0, eve, 1)
 
-    canvas.stroke_style = 'red'
-    canvas.line_width = 0.1
     canvas.stroke_line(joe, 0, 0, eve)
 
     distance = sqrt(joe*joe + eve*eve)
@@ -112,6 +104,4 @@ def draw(time):
 
 slider = FloatSlider(value = 0, min = -1.2, max = 1.2, step = 0.01, readout = True, readout_format = '.2f', layout=Layout(width='800px'))
 interact(draw, time = slider)
-
-display(mc)
-draw(0)
+mc
