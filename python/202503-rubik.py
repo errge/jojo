@@ -108,15 +108,21 @@ tty_attrs = tty.setcbreak(1)
 print(chr(27) + "[2J", end = '')
 try:
     cube = Cube()
+    undo = []
     while True:
         cube.draw()
+        undo.append(cube.state)
         key = sys.stdin.read(1)
         match key:
+            case 'z':
+                if len(undo) >= 2:
+                    undo.pop()
+                    cube.state = undo.pop()
             case '1':
                 cube.mx += 1
             case '2':
                 cube.my += 1
-            case 'q':
+            case 'Q':
                 break
             case 'u':
                 cube.up()
