@@ -6,7 +6,16 @@ from math import ceil
 import os
 from random import choice
 import sys
-from termcolor import colored
+# WARNING: termcolor f1c08c36e33d1223062ce6c44f5ee2094eddbfe2 fixed missing black, but
+# wsl still uses ancient 22.04 ubuntu, and the buggy version of termcolor will be around
+# for decades apparently, thanks to Microsoft. So let's not use black, let's use grey!
+from termcolor import colored, COLORS, HIGHLIGHTS
+# Have to get rid of termcolor completely, buggy, API changing, piece of ...
+COLORS['light_yellow'] = 93
+COLORS['light_grey'] = 37
+COLORS['white'] = 97
+HIGHLIGHTS['on_light_grey'] = 47
+
 import termios
 import time
 import tty
@@ -133,23 +142,23 @@ class Cube:
         for _ in range(vpad):
             pr(' ' * w)
             nextline()
-        pr(hpad + colored('                 y    ▲ww▲    o                                ', 'black', 'on_light_grey') + hpad)
+        pr(hpad + colored('                 y    ▲ww▲    o                                ', 'grey', 'on_light_grey') + hpad)
         nextline()
         for ri in range(len(self.state)):
             r = self.state[ri]
             for repeat in range(2):
                 instruction, instruction_skip = self.instruction(ri, repeat, True)
-                pr(hpad + colored(instruction, 'black', 'on_light_grey'))
+                pr(hpad + colored(instruction, 'grey', 'on_light_grey'))
                 for c in r[instruction_skip:]:
                     if repeat == 0:
                         colorchar('▇▇▇▇ ', c)
                     if repeat == 1:
                         colorchar('🮆🮆🮆🮆 ', c)
-                pr(colored(self.instruction(ri, repeat, False), 'black', 'on_light_grey') + hpad)
+                pr(colored(self.instruction(ri, repeat, False), 'grey', 'on_light_grey') + hpad)
                 nextline()
 
-        # pr(hpad + colored(f'{f"Height: {h}, Width: {w} ":>{dw}}', 'black', 'on_light_grey') + hpad)
-        pr(hpad + colored(f'                 h    ▼ss▼    l       Steps: {self.steps:5d} {f"Anim: {self.anim:.2f}s "}', 'black', 'on_light_grey') + hpad)
+        # pr(hpad + colored(f'{f"Height: {h}, Width: {w} ":>{dw}}', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + colored(f'                 h    ▼ss▼    l       Steps: {self.steps:5d} {f"Anim: {self.anim:.2f}s "}', 'grey', 'on_light_grey') + hpad)
         for _ in range(vpad + 1):
             nextline()
             pr(' ' * w)
@@ -225,7 +234,9 @@ class Cube:
             self.rotatestate(rightcol, 1 * mul)
 
 # cbreak mode means, that we read characters from the terminal wo waiting for newline
-tty_attrs = tty.setcbreak(1)
+# Have to use termios.tcgetattr instead of trusting return of tty.setcbreak (python 3.12 is still too new).
+tty_attrs = termios.tcgetattr(1)
+tty.setcbreak(1)
 clearscreen()
 wrapoff()
 
