@@ -27,6 +27,9 @@ def wrapoff():
 def wrapon():
     pr(chr(27) + '[?7h')
 
+def strcursorleft(i):
+    return chr(27) + f'[{i}D'
+
 def nextline():
     # A very safe next line: go one line down and 1000 characters to the left.
     # But all these movement commands NEVER scroll (not even on the last line).
@@ -66,12 +69,60 @@ class Cube:
         self.my = 2
         self.anim = 0.05
         self.state = []
+        self.steps = 0
         for i in range(3):
             self.state.append(bytearray(' ' * 3 + 'W' * 3 + ' ' * 6, encoding = 'ascii'))
         for i in range(3):
             self.state.append(bytearray('O' * 3 + 'G' * 3 + 'R' * 3 + 'B' * 3, encoding = 'ascii'))
         for i in range(3):
             self.state.append(bytearray(' ' * 3 + 'Y' * 3 + ' ' * 6, encoding = 'ascii'))
+
+    # Very hacky API: if begin is True, we return a tuple, where the second item is how many tiles to skip from the cube
+    def instruction(self, row, rowrepeat, begin):
+        match row, rowrepeat, begin:
+            case 3, 0, True:
+                return 'u ', 0
+            case 3, 0, False:
+                return 'i'
+            case 4, _, True:
+                return 'a◀', 0
+            case 4, _, False:
+                return strcursorleft(1) + '▶d'
+            case 5, 1, True:
+                return 'j ', 0
+            case 5, 1, False:
+                return 'k'
+            case 0, 0, True:
+                msg = '  Front   - m    '
+                return msg, 3
+            case 0, 1, True:
+                msg = "  Front'  - n    "
+                return msg, 3
+            case 1, 0, True:
+                msg = '  Back    - 7    '
+                return msg, 3
+            case 1, 1, True:
+                msg = "  Back'   - 8    "
+                return msg, 3
+            case 6, 1, True:
+                msg = '  Faster  - +    '
+                return msg, 3
+            case 7, 0, True:
+                msg = "  Slower  - -    "
+                return msg, 3
+            case 7, 1, True:
+                msg = '  Shuffle - N    '
+                return msg, 3
+            case 8, 0, True:
+                msg = '  Undo    - z    '
+                return msg, 3
+            case 8, 1, True:
+                msg = "  Quit    - Q    "
+                return msg, 3
+            case _, _, True:
+                return '  ', 0
+            case _, _, False:
+                return ' '
 
     def draw(self):
         w, h = os.get_terminal_size()
@@ -82,21 +133,23 @@ class Cube:
         for _ in range(vpad):
             pr(' ' * w)
             nextline()
-        pr(colored(hpad + '█' * dw + hpad, 'light_grey'))
+        pr(hpad + colored('                 y    ▲ww▲    o                                ', 'black', 'on_light_grey') + hpad)
         nextline()
-        for r in self.state:
+        for ri in range(len(self.state)):
+            r = self.state[ri]
             for repeat in range(2):
-                pr(colored(hpad + '██', 'light_grey'))
-                for c in r:
+                instruction, instruction_skip = self.instruction(ri, repeat, True)
+                pr(hpad + colored(instruction, 'black', 'on_light_grey'))
+                for c in r[instruction_skip:]:
                     if repeat == 0:
                         colorchar('▇▇▇▇ ', c)
                     if repeat == 1:
                         colorchar('🮆🮆🮆🮆 ', c)
-                pr(colored('█', 'light_grey') + hpad)
+                pr(colored(self.instruction(ri, repeat, False), 'black', 'on_light_grey') + hpad)
                 nextline()
 
         # pr(hpad + colored(f'{f"Height: {h}, Width: {w} ":>{dw}}', 'black', 'on_light_grey') + hpad)
-        pr(hpad + colored(f'{f"Anim speed: {self.anim:.2f}s ":>{dw}}', 'black', 'on_light_grey') + hpad)
+        pr(hpad + colored(f'                 h    ▼ss▼    l       Steps: {self.steps:5d} {f"Anim: {self.anim:.2f}s "}', 'black', 'on_light_grey') + hpad)
         for _ in range(vpad + 1):
             nextline()
             pr(' ' * w)
@@ -114,36 +167,42 @@ class Cube:
             time.sleep(self.anim)
 
     def up(self, mul = 1):
+        self.steps += 1
         self.rotatestate(uprow, 1 * mul)
         for i in range(2):
             self.rotatestate(uprow, 1 * mul, False)
             self.rotatestate(upside, -1 * mul)
 
     def down(self, mul = 1):
+        self.steps += 1
         self.rotatestate(downrow, -1 * mul)
         for i in range(2):
             self.rotatestate(downrow, -1 * mul, False)
             self.rotatestate(downside, -1 * mul)
 
     def right(self, mul = 1):
+        self.steps += 1
         self.rotatestate(rightcol, 1 * mul)
         for i in range(2):
             self.rotatestate(rightcol, 1 * mul, False)
             self.rotatestate(rightside, -1 * mul)
 
     def left(self, mul = 1):
+        self.steps += 1
         self.rotatestate(leftcol, 1 * mul)
         for i in range(2):
             self.rotatestate(leftcol, 1 * mul, False)
             self.rotatestate(leftside, 1 * mul)
 
     def front(self, mul = 1):
+        self.steps += 1
         self.rotatestate(frontcirc, 1 * mul)
         for i in range(2):
             self.rotatestate(frontcirc, 1 * mul, False)
             self.rotatestate(frontside, 1 * mul)
 
     def back(self, mul = 1):
+        self.steps += 1
         self.rotatestate(backcirc, 1 * mul)
         for i in range(2):
             self.rotatestate(backcirc, 1 * mul, False)
@@ -176,41 +235,52 @@ try:
     undo = []
     while True:
         cube.draw()
-        undo.append(cube.state)
         if todo:
             key = todo.pop(0)
         else:
             key = sys.stdin.read(1)
         match key:
             case 'z':
-                if len(undo) >= 2:
-                    undo.pop()
+                if len(undo) >= 1:
                     cube.state = undo.pop()
+                    cube.steps -= 1
             case 'Q':
                 break
             case 'u':
+                undo.append(cube.state)
                 cube.up()
             case 'i':
+                undo.append(cube.state)
                 cube.up(-1)
             case 'k':
+                undo.append(cube.state)
                 cube.down()
             case 'j':
+                undo.append(cube.state)
                 cube.down(-1)
             case 'o':
+                undo.append(cube.state)
                 cube.right()
             case 'l':
+                undo.append(cube.state)
                 cube.right(-1)
             case 'y':
+                undo.append(cube.state)
                 cube.left()
             case 'h':
+                undo.append(cube.state)
                 cube.left(-1)
             case 'n':
+                undo.append(cube.state)
                 cube.front()
             case 'm':
+                undo.append(cube.state)
                 cube.front(-1)
             case '7':
+                undo.append(cube.state)
                 cube.back()
             case '8':
+                undo.append(cube.state)
                 cube.back(-1)
             case 'd':
                 cube.cuberight()
@@ -241,6 +311,8 @@ try:
                             cube.up(i)
                         case ('D', i):
                             cube.down(i)
+                undo = []
+                cube.steps = 0
 
 finally:
     # restore input buffering
