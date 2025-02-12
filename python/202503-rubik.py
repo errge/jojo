@@ -20,6 +20,10 @@ import termios
 import time
 import tty
 
+# By increasing stdout buffer, we reduce flickering, because only
+# sys.stdout.flush will talk to the terminal in one big batch.
+sys.stdout = open(1, "w", buffering = 10485760)
+
 def pr(str):
     print(str, end = '')
 
@@ -92,73 +96,84 @@ class Cube:
             case 3, 0, True:
                 return 'u ', 0
             case 3, 0, False:
-                return 'i'
-            case 4, _, True:
-                return 'a◀', 0
-            case 4, _, False:
-                return strcursorleft(1) + '▶d'
+                return ' i'
+            case (4, 0, True):
+                return 'a ', 0
+            case (4, 1, True):
+                return '◀◀', 0
+            case (4, 0, False):
+                return ' d'
+            case (4, 1, False):
+                return '▶▶'
             case 5, 1, True:
                 return 'j ', 0
             case 5, 1, False:
-                return 'k'
+                return ' k'
             case 0, 0, True:
-                msg = '  Front   - m    '
-                return msg, 3
+                msg = '  Front   - m '
+                return msg, 2
             case 0, 1, True:
-                msg = "  Front'  - n    "
-                return msg, 3
+                msg = "  Front'  - n "
+                return msg, 2
+            case 0, 2, True:
+                msg = '  Back    - 7 '
+                return msg, 2
             case 1, 0, True:
-                msg = '  Back    - 7    '
+                msg = "  Back'   - 8 "
+                return msg, 2
+            case 1, 2, True:
+                msg = "  Sexy    - ouli    "
                 return msg, 3
-            case 1, 1, True:
-                msg = "  Back'   - 8    "
+            case 2, 0, True:
+                msg = "  Sexy'   - uoil    "
                 return msg, 3
             case 6, 1, True:
-                msg = '  Faster  - +    '
-                return msg, 3
-            case 7, 0, True:
-                msg = "  Slower  - -    "
-                return msg, 3
+                msg = '  Slower  - + '
+                return msg, 2
+            case 6, 2, True:
+                msg = '  Faster  - - '
+                return msg, 2
             case 7, 1, True:
-                msg = '  Shuffle - N    '
-                return msg, 3
-            case 8, 0, True:
-                msg = '  Undo    - z    '
-                return msg, 3
-            case 8, 1, True:
-                msg = "  Quit    - Q    "
-                return msg, 3
+                msg = '  Shuffle - N '
+                return msg, 2
+            case 7, 2, True:
+                msg = '  Undo    - z '
+                return msg, 2
+            case 8, 2, True:
+                msg = '  Quit    - Q '
+                return msg, 2
             case _, _, True:
                 return '  ', 0
             case _, _, False:
-                return ' '
+                return '  '
 
     def draw(self):
         w, h = os.get_terminal_size()
-        dw, dh = 63, 20
+        dw, dh = 75, 30
         vpad = int((h - dh) / 2)
         hpad = ' ' * ceil((w - dw) / 2)
         cursorhome()
         for _ in range(vpad):
             pr(' ' * w)
             nextline()
-        pr(hpad + colored('                 y    ▲ww▲    o                                ', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + colored('                      y   ▲ w ▲   o                                        ', 'grey', 'on_light_grey') + hpad)
         nextline()
         for ri in range(len(self.state)):
             r = self.state[ri]
-            for repeat in range(2):
+            for repeat in range(3):
                 instruction, instruction_skip = self.instruction(ri, repeat, True)
                 pr(hpad + colored(instruction, 'grey', 'on_light_grey'))
                 for c in r[instruction_skip:]:
                     if repeat == 0:
-                        colorchar('▇▇▇▇ ', c)
+                        colorchar('▇▇▇▇▇ ', c)
                     if repeat == 1:
-                        colorchar('🮆🮆🮆🮆 ', c)
-                pr(colored(self.instruction(ri, repeat, False), 'grey', 'on_light_grey') + hpad)
+                        colorchar('█████ ', c)
+                    if repeat == 2:
+                        colorchar('▀▀▀▀▀ ', c)
+                pr(strcursorleft(1) + colored(self.instruction(ri, repeat, False), 'grey', 'on_light_grey') + hpad)
                 nextline()
 
-        # pr(hpad + colored(f'{f"Height: {h}, Width: {w} ":>{dw}}', 'grey', 'on_light_grey') + hpad)
-        pr(hpad + colored(f'                 h    ▼ss▼    l       Steps: {self.steps:5d} {f"Anim: {self.anim:.2f}s "}', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + colored(f'                      h   ▼ s ▼   l               {self.steps:4d} Steps   {f"Anim: {self.anim:.2f}s "}', 'grey', 'on_light_grey') + hpad)
         for _ in range(vpad + 1):
             nextline()
             pr(' ' * w)
