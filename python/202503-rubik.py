@@ -24,6 +24,29 @@ import tty
 # sys.stdout.flush will talk to the terminal in one big batch.
 sys.stdout = open(1, "w", buffering = 10485760)
 
+class ReadOrResize():
+    def __init__(self):
+        import signal
+        import socket
+        import selectors
+        self.read, self.write = socket.socketpair()
+        self.selector = selectors.DefaultSelector()
+        self.selector.register(self.read, selectors.EVENT_READ)
+        self.selector.register(sys.stdin, selectors.EVENT_READ)
+        self.handler = lambda _signal, _frame: self.tick()
+        signal.signal(signal.SIGWINCH, self.handler)
+
+    def tick(self):
+        self.write.send(b'\0')
+
+    def readOrResize(self):
+        for key, _ in self.selector.select():
+            if key.fileobj == sys.stdin:
+                return sys.stdin.read(1)
+            else:
+                self.read.recv(1)
+                return "resize"
+
 def pr(str):
     print(str, end = '')
 
@@ -257,6 +280,7 @@ wrapoff()
 
 todo = []
 try:
+    readOrResize = ReadOrResize()
     cube = Cube()
     undo = []
     while True:
@@ -264,7 +288,7 @@ try:
         if todo:
             key = todo.pop(0)
         else:
-            key = sys.stdin.read(1)
+            key = readOrResize.readOrResize()
         match key:
             case 'x':
                 if len(undo) >= 1:
