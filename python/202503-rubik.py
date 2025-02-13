@@ -29,6 +29,12 @@ class ReadOrResize():
         import signal
         import socket
         import selectors
+
+        # Reopen stdin unbuffered binary, because otherwise if the user
+        # is pressing buttons faster than the animation, then our selector
+        # gets stuck.
+        sys.stdin = os.fdopen(0, buffering=0, mode='rb')
+
         self.read, self.write = socket.socketpair()
         self.selector = selectors.DefaultSelector()
         self.selector.register(self.read, selectors.EVENT_READ)
@@ -42,7 +48,7 @@ class ReadOrResize():
     def readOrResize(self):
         for key, _ in self.selector.select():
             if key.fileobj == sys.stdin:
-                return sys.stdin.read(1)
+                return sys.stdin.read(1).decode('ascii')
             else:
                 self.read.recv(1)
                 return "resize"
@@ -278,17 +284,13 @@ tty.setcbreak(1)
 clearscreen()
 wrapoff()
 
-todo = []
 try:
     readOrResize = ReadOrResize()
     cube = Cube()
     undo = []
     while True:
         cube.draw()
-        if todo:
-            key = todo.pop(0)
-        else:
-            key = readOrResize.readOrResize()
+        key = readOrResize.readOrResize()
         match key:
             case 'x':
                 if len(undo) >= 1:
