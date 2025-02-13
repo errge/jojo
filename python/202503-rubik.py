@@ -137,7 +137,7 @@ class Cube:
                 msg = '  Shuffle - N '
                 return msg, 2
             case 7, 2, True:
-                msg = '  Undo    - z '
+                msg = '  Undo    - x '
                 return msg, 2
             case 8, 2, True:
                 msg = '  Quit    - Q '
@@ -156,7 +156,7 @@ class Cube:
         for _ in range(vpad):
             pr(' ' * w)
             nextline()
-        pr(hpad + colored('                      y   ▲ w ▲   o                                        ', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + colored('                     y/z  ▲ w ▲   o                                        ', 'grey', 'on_light_grey') + hpad)
         nextline()
         for ri in range(len(self.state)):
             r = self.state[ri]
@@ -266,7 +266,7 @@ try:
         else:
             key = sys.stdin.read(1)
         match key:
-            case 'z':
+            case 'x':
                 if len(undo) >= 1:
                     cube.state = undo.pop()
                     cube.steps -= 1
@@ -290,7 +290,7 @@ try:
             case 'l':
                 undo.append(cube.state)
                 cube.right(-1)
-            case 'y':
+            case 'y' | 'z':
                 undo.append(cube.state)
                 cube.left()
             case 'h':
@@ -316,9 +316,9 @@ try:
                 cube.cubeup()
             case 's':
                 cube.cubeup(-1)
-            case '+':
+            case '+' | '=':
                 cube.anim += 0.01
-            case '-':
+            case '-' | '_':
                 cube.anim -= 0.01
                 cube.anim = max(cube.anim, 0)
             case 'N':
