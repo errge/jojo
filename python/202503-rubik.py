@@ -349,9 +349,12 @@ try:
                 cube.anim = max(cube.anim, 0)
             case 'N':
                 shuffle = list(product([cube.left, cube.front, cube.right, cube.up, cube.down, cube.back], [-1, 1, 2]))
-                for s in range(50):
+                oldanim = cube.anim
+                cube.anim = 0
+                for s in range(400):
                     f, i = choice(shuffle)
                     f(i)
+                cube.anim = oldanim
                 undo = []
                 cube.steps = 0
 
