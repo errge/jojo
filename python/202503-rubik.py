@@ -348,21 +348,10 @@ try:
                 cube.anim -= 0.01
                 cube.anim = max(cube.anim, 0)
             case 'N':
-                shuffle = list(product(['L', 'F', 'U', 'D', 'B'], [-1, 1, 2]))
-                for s in range(20):
-                    match choice(shuffle):
-                        case ('L', i):
-                            cube.left(i)
-                        case ('R', i):
-                            cube.right(i)
-                        case ('F', i):
-                            cube.front(i)
-                        case ('B', i):
-                            cube.back(i)
-                        case ('U', i):
-                            cube.up(i)
-                        case ('D', i):
-                            cube.down(i)
+                shuffle = list(product([cube.left, cube.front, cube.right, cube.up, cube.down, cube.back], [-1, 1, 2]))
+                for s in range(50):
+                    f, i = choice(shuffle)
+                    f(i)
                 undo = []
                 cube.steps = 0
 
