@@ -1,26 +1,22 @@
 import sys
 
-bytes = sys.stdin.read().encode('ascii')
-input = []
-for b in bytes:
-    input.append(b)
+gamelen = 256
+
+input = list(sys.stdin.read().encode('ascii'))
 input += [17, 31, 73, 47, 23]
 input *= 64
 
-gamelen = 256
-list = list(range(gamelen))
-skip = 0
-jumptotal = 0
+list, skip, jumptotal = list(range(gamelen)), 0, 0
 while input:
     inp = input.pop(0)
     if inp > 0: list[:inp] = list[inp-1::-1]   # Corner-case only in big input: inp == 0
-    reord = (inp+skip) % gamelen
-    list = list[reord:] + list[:reord]
-    jumptotal += inp+skip
+    jump = (inp+skip) % gamelen
+    list = list[jump:] + list[:jump]
+    jumptotal += jump
+    jumptotal %= gamelen
     skip += 1
-back = gamelen - jumptotal % gamelen
-list = list[back:] + list[:back]
-print(list)
+jumpback = gamelen - jumptotal
+list = list[jumpback:] + list[:jumpback]
 
 while list:
     list16 = list[:16]
