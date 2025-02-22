@@ -108,7 +108,6 @@ backcirc  = [(0, 3), (0, 4), (0, 5), (3, 8), (4, 8), (5, 8), (8, 5), (8, 4), (8,
 
 class Cube:
     def __init__(self):
-        self.my = 2
         self.anim = 0.05
         self.state = []
         self.steps = 0
@@ -202,80 +201,86 @@ class Cube:
                 pr(strcursorleft(1) + colored(self.instruction(ri, repeat, False), 'grey', 'on_light_grey') + hpad)
                 nextline()
 
-        pr(hpad + colored(f'                      h   ▼ s ▼   l               {self.steps:4d} Steps   {f"Anim: {self.anim:.2f}s "}', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + colored(f'                      h   ▼ s ▼   l               {self.steps:4d} Steps   {f"Anim: {self.anim:.2f}s " if self.anim else "Anim off    "}', 'grey', 'on_light_grey') + hpad)
         for _ in range(vpad + 1):
             nextline()
             pr(' ' * w)
         sys.stdout.flush()
 
-    def rotatestate(self, how, howmuch, anim = True):
+    def doanim(self, force = False):
+        if self.anim:
+            time.sleep(self.anim)
+            self.draw()
+        elif force:
+            self.draw()
+        return 0
+
+    def rotatestate(self, how, howmuch):
         newstate = deepcopy(self.state)
         for i in range(len(how)):
             y, x = how[i]
             y_, x_ = how[(i+howmuch) % len(how)]
             newstate[y][x] = self.state[y_][x_]
         self.state = newstate
-        if anim:
-            self.draw()
-            time.sleep(self.anim)
+        return 0
 
     def up(self, mul = 1):
         self.steps += 1
-        self.rotatestate(uprow, 1 * mul)
+        self.rotatestate(uprow, 1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(uprow, 1 * mul, False)
-            self.rotatestate(upside, -1 * mul)
+            self.rotatestate(uprow, 1 * mul)
+            self.rotatestate(upside, -1 * mul) + self.doanim(True)
 
     def down(self, mul = 1):
         self.steps += 1
-        self.rotatestate(downrow, -1 * mul)
+        self.rotatestate(downrow, -1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(downrow, -1 * mul, False)
-            self.rotatestate(downside, -1 * mul)
+            self.rotatestate(downrow, -1 * mul)
+            self.rotatestate(downside, -1 * mul) + self.doanim(True)
 
     def right(self, mul = 1):
         self.steps += 1
-        self.rotatestate(rightcol, 1 * mul)
+        self.rotatestate(rightcol, 1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(rightcol, 1 * mul, False)
-            self.rotatestate(rightside, -1 * mul)
+            self.rotatestate(rightcol, 1 * mul)
+            self.rotatestate(rightside, -1 * mul) + self.doanim(True)
 
     def left(self, mul = 1):
         self.steps += 1
-        self.rotatestate(leftcol, 1 * mul)
+        self.rotatestate(leftcol, 1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(leftcol, 1 * mul, False)
-            self.rotatestate(leftside, 1 * mul)
+            self.rotatestate(leftcol, 1 * mul)
+            self.rotatestate(leftside, 1 * mul) + self.doanim(True)
 
     def front(self, mul = 1):
         self.steps += 1
-        self.rotatestate(frontcirc, 1 * mul)
+        self.rotatestate(frontcirc, 1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(frontcirc, 1 * mul, False)
-            self.rotatestate(frontside, 1 * mul)
+            self.rotatestate(frontcirc, 1 * mul)
+            self.rotatestate(frontside, 1 * mul) + self.doanim(True)
 
     def back(self, mul = 1):
         self.steps += 1
-        self.rotatestate(backcirc, 1 * mul)
+        self.rotatestate(backcirc, 1 * mul) + self.doanim()
         for i in range(2):
-            self.rotatestate(backcirc, 1 * mul, False)
-            self.rotatestate(backside, -1 * mul)
+            self.rotatestate(backcirc, 1 * mul)
+            self.rotatestate(backside, -1 * mul) + self.doanim(True)
 
     def cuberight(self, mul = 1):
         for i in range(3):
-            if i: self.rotatestate(upside, 1 * mul, False)
-            if i: self.rotatestate(downside, -1 * mul, False)
-            self.rotatestate(uprow, -1 * mul, False)
-            self.rotatestate(midrow, -1 * mul, False)
-            self.rotatestate(downrow, -1 * mul)
+            if i: self.rotatestate(upside, 1 * mul)
+            if i: self.rotatestate(downside, -1 * mul)
+            self.rotatestate(uprow, -1 * mul)
+            self.rotatestate(midrow, -1 * mul)
+            self.rotatestate(downrow, -1 * mul) + self.doanim(True)
 
     def cubeup(self, mul = 1):
         for i in range(3):
-            if i: self.rotatestate(leftside, 1 * mul, False)
-            if i: self.rotatestate(rightside, -1 * mul, False)
-            self.rotatestate(leftcol, 1 * mul, False)
-            self.rotatestate(midcol, 1 * mul, False)
-            self.rotatestate(rightcol, 1 * mul)
+            if i: self.rotatestate(leftside, 1 * mul)
+            if i: self.rotatestate(rightside, -1 * mul)
+            self.rotatestate(leftcol, 1 * mul)
+            self.rotatestate(midcol, 1 * mul)
+            self.rotatestate(rightcol, 1 * mul) + self.doanim(True)
 
 # cbreak mode means, that we read characters from the terminal wo waiting for newline
 # Have to use termios.tcgetattr instead of trusting return of tty.setcbreak (python 3.12 is still too new).
@@ -288,14 +293,17 @@ try:
     readOrResize = ReadOrResize()
     cube = Cube()
     undo = []
+    cube.draw()
     while True:
-        cube.draw()
         key = readOrResize.readOrResize()
         match key:
+            case 'resize':
+                cube.draw()
             case 'x':
                 if len(undo) >= 1:
                     cube.state = undo.pop()
                     cube.steps -= 1
+                    cube.draw()
             case 'Q':
                 break
             case 'u':
@@ -344,19 +352,22 @@ try:
                 cube.cubeup(-1)
             case '+' | '=':
                 cube.anim += 0.01
+                cube.draw()
             case '-' | '_':
                 cube.anim -= 0.01
                 cube.anim = max(cube.anim, 0)
+                cube.draw()
             case 'N':
                 shuffle = list(product([cube.left, cube.front, cube.right, cube.up, cube.down, cube.back], [-1, 1, 2]))
                 oldanim = cube.anim
                 cube.anim = 0
-                for s in range(400):
+                for s in range(100):
                     f, i = choice(shuffle)
                     f(i)
                 cube.anim = oldanim
                 undo = []
                 cube.steps = 0
+                cube.draw()
 
 finally:
     # restore input buffering
