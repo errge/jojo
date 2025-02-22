@@ -111,6 +111,7 @@ class Cube:
         self.anim = 0.05
         self.state = []
         self.steps = 0
+        self.history = [] # tuples of (self.move_fn, mul)
         for i in range(3):
             self.state.append(bytearray(' ' * 3 + 'W' * 3 + ' ' * 6, encoding = 'ascii'))
         for i in range(3):
@@ -224,49 +225,62 @@ class Cube:
         self.state = newstate
         return 0
 
-    def up(self, mul = 1):
-        self.steps += 1
+    def registermove(self, fn, mul, undo, counts = True):
+        if undo:
+            if counts: self.steps -= 1
+        else:
+            if counts: self.steps += 1
+            self.history.append((fn, -mul))
+
+    def undo(self):
+        if len(self.history) > 0:
+            fn, mul = self.history.pop()
+            fn(mul, True)
+
+    def up(self, mul, undo = False):
+        self.registermove(self.up, mul, undo)
         self.rotatestate(uprow, 1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(uprow, 1 * mul)
             self.rotatestate(upside, -1 * mul) + self.doanim(True)
 
-    def down(self, mul = 1):
-        self.steps += 1
+    def down(self, mul, undo = False):
+        self.registermove(self.down, mul, undo)
         self.rotatestate(downrow, -1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(downrow, -1 * mul)
             self.rotatestate(downside, -1 * mul) + self.doanim(True)
 
-    def right(self, mul = 1):
-        self.steps += 1
+    def right(self, mul, undo = False):
+        self.registermove(self.right, mul, undo)
         self.rotatestate(rightcol, 1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(rightcol, 1 * mul)
             self.rotatestate(rightside, -1 * mul) + self.doanim(True)
 
-    def left(self, mul = 1):
-        self.steps += 1
+    def left(self, mul, undo = False):
+        self.registermove(self.left, mul, undo)
         self.rotatestate(leftcol, 1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(leftcol, 1 * mul)
             self.rotatestate(leftside, 1 * mul) + self.doanim(True)
 
-    def front(self, mul = 1):
-        self.steps += 1
+    def front(self, mul, undo = False):
+        self.registermove(self.front, mul, undo)
         self.rotatestate(frontcirc, 1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(frontcirc, 1 * mul)
             self.rotatestate(frontside, 1 * mul) + self.doanim(True)
 
-    def back(self, mul = 1):
-        self.steps += 1
+    def back(self, mul, undo = False):
+        self.registermove(self.back, mul, undo)
         self.rotatestate(backcirc, 1 * mul) + self.doanim()
         for i in range(2):
             self.rotatestate(backcirc, 1 * mul)
             self.rotatestate(backside, -1 * mul) + self.doanim(True)
 
-    def cuberight(self, mul = 1):
+    def cuberight(self, mul, undo = False):
+        self.registermove(self.cuberight, mul, undo, False)
         for i in range(3):
             if i: self.rotatestate(upside, 1 * mul)
             if i: self.rotatestate(downside, -1 * mul)
@@ -274,7 +288,8 @@ class Cube:
             self.rotatestate(midrow, -1 * mul)
             self.rotatestate(downrow, -1 * mul) + self.doanim(True)
 
-    def cubeup(self, mul = 1):
+    def cubeup(self, mul, undo = False):
+        self.registermove(self.cubeup, mul, undo, False)
         for i in range(3):
             if i: self.rotatestate(leftside, 1 * mul)
             if i: self.rotatestate(rightside, -1 * mul)
@@ -292,7 +307,6 @@ wrapoff()
 try:
     readOrResize = ReadOrResize()
     cube = Cube()
-    undo = []
     cube.draw()
     while True:
         key = readOrResize.readOrResize()
@@ -300,54 +314,39 @@ try:
             case 'resize':
                 cube.draw()
             case 'x':
-                if len(undo) >= 1:
-                    cube.state = undo.pop()
-                    cube.steps -= 1
-                    cube.draw()
+                cube.undo()
             case 'Q':
                 break
             case 'u':
-                undo.append(cube.state)
-                cube.up()
+                cube.up(1)
             case 'i':
-                undo.append(cube.state)
                 cube.up(-1)
             case 'k':
-                undo.append(cube.state)
-                cube.down()
+                cube.down(1)
             case 'j':
-                undo.append(cube.state)
                 cube.down(-1)
             case 'o':
-                undo.append(cube.state)
-                cube.right()
+                cube.right(1)
             case 'l':
-                undo.append(cube.state)
                 cube.right(-1)
             case 'y' | 'z':
-                undo.append(cube.state)
-                cube.left()
+                cube.left(1)
             case 'h':
-                undo.append(cube.state)
                 cube.left(-1)
             case 'n':
-                undo.append(cube.state)
-                cube.front()
+                cube.front(1)
             case 'm':
-                undo.append(cube.state)
                 cube.front(-1)
             case '7':
-                undo.append(cube.state)
-                cube.back()
+                cube.back(1)
             case '8':
-                undo.append(cube.state)
                 cube.back(-1)
             case 'd':
-                cube.cuberight()
+                cube.cuberight(1)
             case 'a':
                 cube.cuberight(-1)
             case 'w':
-                cube.cubeup()
+                cube.cubeup(1)
             case 's':
                 cube.cubeup(-1)
             case '+' | '=':
@@ -365,8 +364,7 @@ try:
                     f, i = choice(shuffle)
                     f(i)
                 cube.anim = oldanim
-                undo = []
-                cube.steps = 0
+                cube.history, cube.steps = [], 0
                 cube.draw()
 
 finally:
