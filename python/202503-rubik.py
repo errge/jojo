@@ -6,15 +6,6 @@ from math import ceil
 import os
 from random import choice
 import sys
-# WARNING: termcolor f1c08c36e33d1223062ce6c44f5ee2094eddbfe2 fixed missing black, but
-# wsl still uses ancient 22.04 ubuntu, and the buggy version of termcolor will be around
-# for decades apparently, thanks to Microsoft. So let's not use black, let's use grey!
-from termcolor import colored, COLORS, HIGHLIGHTS
-# Have to get rid of termcolor completely, buggy, API changing, piece of ...
-COLORS['light_yellow'] = 93
-COLORS['light_grey'] = 37
-COLORS['white'] = 97
-HIGHLIGHTS['on_light_grey'] = 47
 
 import termios
 import time
@@ -69,6 +60,18 @@ def wrapoff():
 def wrapon():
     pr(chr(27) + '[?7h')
 
+def blackbackground():
+    pr(chr(27) + '[48;2;0;0;0m')
+
+def resetcolors():
+    pr(chr(27) + '[0m')
+
+def hidecursor():
+    pr(chr(27) + '[?25l')
+
+def showcursor():
+    pr(chr(27) + '[?25h')
+
 def strcursorleft(i):
     return chr(27) + f'[{i}D'
 
@@ -79,17 +82,27 @@ def nextline():
     pr(chr(27) + '[1B' + chr(27) + '[1000D')
 
 colors = {
-    'W': 'white',
-    'G': 'green',
-    'O': 'yellow',
-    'Y': 'light_yellow',
-    'R': 'red',
-    'B': 'blue',
-    ' ': 'light_grey',
+    'W': (255, 255, 255),
+    'G': (0, 155, 72),
+    'O': (255, 88, 0),
+    'Y': (255, 213, 0),
+    'R': (183, 18, 52),
+    'B': (0, 64, 173),
+    ' ': (0, 0, 0),    # Use to print background, black
+    'I': (102, 102, 102), # Instructions
 }
 
-def colorchar(char, color):
-    pr(colored(char, colors[chr(color)], 'on_light_grey'))
+def coloredtext(text, rgb):
+    r, g, b = rgb
+    print(chr(27) + f'[38;2;{r};{g};{b}m', end = '')
+
+    return text
+
+def whitetext(text):
+    return coloredtext(text, colors['I'])
+
+def colorchar(char, color_int):
+    pr(coloredtext(char, colors[chr(color_int)]))
 
 upside    = [(0, 3), (0, 4), (0, 5), (1, 5), (2, 5), (2,4), (2, 3), (1, 3)]
 uprow     = [(3, x) for x in range(12)]
@@ -185,13 +198,13 @@ class Cube:
         for _ in range(vpad):
             pr(' ' * w)
             nextline()
-        pr(hpad + colored('                     y/z  ▲ w ▲   o                                        ', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + whitetext('                     y/z  ▲ w ▲   o                                        ') + hpad)
         nextline()
         for ri in range(len(self.state)):
             r = self.state[ri]
             for repeat in range(3):
                 instruction, instruction_skip = self.instruction(ri, repeat, True)
-                pr(hpad + colored(instruction, 'grey', 'on_light_grey'))
+                pr(hpad + whitetext(instruction))
                 for c in r[instruction_skip:]:
                     if repeat == 0:
                         colorchar('▇▇▇▇▇ ', c)
@@ -199,10 +212,10 @@ class Cube:
                         colorchar('█████ ', c)
                     if repeat == 2:
                         colorchar('▀▀▀▀▀ ', c)
-                pr(strcursorleft(1) + colored(self.instruction(ri, repeat, False), 'grey', 'on_light_grey') + hpad)
+                pr(strcursorleft(1) + whitetext(self.instruction(ri, repeat, False)) + hpad)
                 nextline()
 
-        pr(hpad + colored(f'                      h   ▼ s ▼   l               {self.steps:4d} Steps   {f"Anim: {self.anim:.2f}s " if self.anim else "Anim off    "}', 'grey', 'on_light_grey') + hpad)
+        pr(hpad + whitetext(f'                      h   ▼ s ▼   l               {self.steps:4d} Steps   {f"Anim: {self.anim:.2f}s " if self.anim else "Anim off    "}') + hpad)
         for _ in range(vpad + 1):
             nextline()
             pr(' ' * w)
@@ -303,6 +316,8 @@ tty_attrs = termios.tcgetattr(1)
 tty.setcbreak(1)
 clearscreen()
 wrapoff()
+blackbackground()
+hidecursor()
 
 try:
     readOrResize = ReadOrResize()
@@ -371,4 +386,8 @@ finally:
     # restore input buffering
     termios.tcsetattr(1, termios.TCSAFLUSH, tty_attrs)
     wrapon()
+    resetcolors()
+    showcursor()
+    # new line at end of program
+    print()
     sys.stdout.flush()
